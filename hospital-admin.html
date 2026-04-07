@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedCare — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5f0e8;
+    --dark: #1a1a2e;
+    --teal: #0d7377;
+    --teal-light: #14a085;
+    --teal-dim: rgba(13,115,119,0.10);
+    --gold: #c9a84c;
+    --gold-dim: rgba(201,168,76,0.12);
+    --muted: #6b7280;
+    --white: #ffffff;
+    --danger: #e53e3e;
+    --danger-dim: rgba(229,62,62,0.09);
+    --warning: #d69e2e;
+    --success: #38a169;
+    --success-dim: rgba(56,161,105,0.10);
+    --border: #e8e3d8;
+    --sidebar-w: 240px;
+    --header-h: 66px;
+    --shadow: 0 4px 24px rgba(13,115,119,0.08);
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f0ebe0;
+    color: var(--dark);
+    min-height: 100vh;
+    display: flex;
+    overflow-x: hidden;
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 100;
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar-logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .sidebar-logo .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .sidebar-logo .logo span { color: var(--teal-light); }
+  .sidebar-logo .role-badge {
+    display: inline-block;
+    background: var(--teal-dim);
+    color: var(--teal-light);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 6px;
+  }
+
+  .nav-section-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    padding: 20px 24px 8px;
+    font-weight: 500;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 24px;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.55);
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+    margin: 1px 0;
+  }
+
+  .nav-item:hover {
+    background: rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.85);
+  }
+
+  .nav-item.active {
+    background: rgba(13,115,119,0.18);
+    color: #fff;
+    border-left-color: var(--teal-light);
+  }
+
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 20px 24px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .admin-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600; color: #fff;
+    font-family: 'Cormorant Garamond', serif;
+    flex-shrink: 0;
+  }
+
+  .admin-info .admin-name { font-size: 13px; font-weight: 500; color: #fff; }
+  .admin-info .admin-role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+  /* ─── MAIN CONTENT ─── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* ─── TOP BAR ─── */
+  .topbar {
+    height: var(--header-h);
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  }
+
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+
+  .page-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--dark);
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+
+  .topbar-btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .topbar-btn.primary {
+    background: var(--teal);
+    color: #fff;
+  }
+  .topbar-btn.primary:hover { background: var(--teal-light); }
+
+  .topbar-btn.secondary {
+    background: transparent;
+    color: var(--muted);
+    border: 1.5px solid var(--border);
+  }
+  .topbar-btn.secondary:hover { border-color: var(--teal); color: var(--teal); }
+
+  .notif-dot {
+    width: 8px; height: 8px;
+    background: var(--danger);
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: -4px;
+    margin-bottom: 8px;
+  }
+
+  /* ─── PAGE CONTENT ─── */
+  .content {
+    padding: 32px;
+    flex: 1;
+  }
+
+  .page-view { display: none; animation: fadeUp 0.3s ease; }
+  .page-view.active { display: block; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ─── STAT CARDS ─── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .stat-card.teal::before { background: linear-gradient(90deg, var(--teal), var(--teal-light)); }
+  .stat-card.gold::before { background: linear-gradient(90deg, var(--gold), #e8c56b); }
+  .stat-card.success::before { background: linear-gradient(90deg, var(--success), #48bb78); }
+  .stat-card.danger::before { background: linear-gradient(90deg, var(--danger), #fc8181); }
+
+  .stat-label { font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 600; color: var(--dark); line-height: 1; }
+  .stat-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .stat-icon { position: absolute; right: 20px; top: 20px; font-size: 26px; opacity: 0.15; }
+
+  /* ─── TABLE ─── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark);
+  }
+
+  .card-actions { display: flex; gap: 10px; align-items: center; }
+
+  .search-input {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--dark);
+    background: #fafafa;
+    outline: none;
+    transition: all 0.2s;
+    width: 200px;
+  }
+  .search-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-dim); }
+
+  .filter-select {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--dark);
+    background: #fafafa;
+    outline: none;
+    cursor: pointer;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 12px 20px;
+    text-align: left;
+    background: #f9f7f3;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 14px 20px;
+    font-size: 13.5px;
+    border-bottom: 1px solid #f5f3ef;
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #faf8f5; }
+
+  .badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+
+  .badge-status.confirmed { background: var(--success-dim); color: var(--success); }
+  .badge-status.pending   { background: var(--gold-dim); color: var(--warning); }
+  .badge-status.cancelled { background: var(--danger-dim); color: var(--danger); }
+  .badge-status.completed { background: var(--teal-dim); color: var(--teal); }
+
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .action-btn {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+    margin-right: 4px;
+  }
+  .action-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .action-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+  .action-btn.success:hover { border-color: var(--success); color: var(--success); }
+
+  /* ─── DOCTOR AVATAR ─── */
+  .mini-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: #fff;
+    font-family: 'Cormorant Garamond', serif;
+    margin-right: 8px;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+
+  .cell-with-avatar { display: flex; align-items: center; }
+
+  /* ─── EMPTY STATE ─── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty-state .empty-icon { font-size: 42px; margin-bottom: 14px; opacity: 0.5; }
+  .empty-state p { font-size: 14px; }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(26,26,46,0.5);
+    backdrop-filter: blur(3px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    animation: fadeOverlay 0.2s ease;
+  }
+  .modal-overlay.open { display: flex; }
+
+  @keyframes fadeOverlay { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 36px;
+    width: 540px;
+    max-width: 95vw;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+    animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+  }
+
+  @keyframes modalIn { from { opacity: 0; transform: scale(0.92) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+  .modal-close {
+    position: absolute; top: 18px; right: 18px;
+    background: #f5f0e8; border: none;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    cursor: pointer; font-size: 16px; color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .modal-close:hover { background: var(--danger-dim); color: var(--danger); }
+
+  .modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 600;
+    color: var(--dark); margin-bottom: 6px;
+  }
+  .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+  .form-group-modal { margin-bottom: 16px; }
+  .form-group-modal label {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.5px;
+    text-transform: uppercase; color: var(--dark); display: block; margin-bottom: 6px;
+  }
+  .form-group-modal input,
+  .form-group-modal select,
+  .form-group-modal textarea {
+    width: 100%; border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 13.5px; font-family: 'DM Sans', sans-serif;
+    color: var(--dark); background: #fafafa; outline: none;
+    transition: all 0.2s;
+  }
+  .form-group-modal input:focus,
+  .form-group-modal select:focus,
+  .form-group-modal textarea:focus {
+    border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-dim);
+  }
+
+  .modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .modal-actions {
+    display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;
+  }
+
+  .btn-modal {
+    padding: 10px 22px; border-radius: 9px; font-size: 13.5px;
+    font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    border: none; transition: all 0.2s;
+  }
+  .btn-modal.primary { background: var(--teal); color: #fff; }
+  .btn-modal.primary:hover { background: var(--teal-light); }
+  .btn-modal.secondary { background: #f5f0e8; color: var(--muted); }
+  .btn-modal.secondary:hover { background: var(--border); }
+
+  /* ─── TOAST ─── */
+  .toast-container {
+    position: fixed; bottom: 28px; right: 28px;
+    z-index: 999; display: flex; flex-direction: column; gap: 10px;
+  }
+
+  .toast {
+    background: var(--dark);
+    color: #fff;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    animation: toastIn 0.3s ease;
+    min-width: 260px;
+    border-left: 4px solid var(--teal-light);
+  }
+  .toast.success { border-left-color: var(--success); }
+  .toast.danger  { border-left-color: var(--danger); }
+  .toast.warning { border-left-color: var(--gold); }
+
+  @keyframes toastIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes toastOut { to { opacity: 0; transform: translateX(30px); } }
+
+  /* ─── CHART AREA ─── */
+  .chart-row { display: grid; grid-template-columns: 2fr 1fr; gap: 18px; margin-bottom: 28px; }
+
+  .mini-bar-wrap { padding: 20px 24px; }
+  .mini-bar-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .mini-bar-track { background: #f0ebe0; border-radius: 4px; height: 7px; overflow: hidden; margin-bottom: 12px; }
+  .mini-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--teal), var(--teal-light)); transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+
+  /* ─── DOCTORS VIEW ─── */
+  .doctors-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 8px;
+  }
+
+  .doctor-card-admin {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s;
+    text-align: center;
+  }
+  .doctor-card-admin:hover { transform: translateY(-3px); }
+
+  .doc-avatar-lg {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 600; color: #fff;
+    font-family: 'Cormorant Garamond', serif;
+    margin: 0 auto 12px;
+  }
+
+  .doc-name { font-weight: 600; font-size: 15px; color: var(--dark); margin-bottom: 3px; }
+  .doc-spec { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .doc-stats { display: flex; justify-content: center; gap: 20px; }
+  .doc-stat-item { text-align: center; }
+  .doc-stat-val { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--dark); }
+  .doc-stat-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
+
+  /* ─── DETAIL PANEL ─── */
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .detail-row { display: flex; flex-direction: column; gap: 3px; }
+  .detail-row .dl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
+  .detail-row .dv { font-size: 14px; font-weight: 500; color: var(--dark); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1024px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .chart-row { grid-template-columns: 1fr; }
+    .doctors-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .content { padding: 20px; }
+    .doctors-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ─── PAGINATION ─── */
+  .pagination { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border); }
+  .page-info { font-size: 13px; color: var(--muted); }
+  .page-btns { display: flex; gap: 6px; }
+  .page-btn {
+    padding: 5px 12px; border-radius: 6px; font-size: 12px;
+    cursor: pointer; border: 1.5px solid var(--border); background: transparent;
+    color: var(--muted); font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .page-btn:hover, .page-btn.active { border-color: var(--teal); color: var(--teal); }
+
+  /* Activity Timeline */
+  .timeline { padding: 20px 24px; }
+  .timeline-item { display: flex; gap: 14px; padding: 10px 0; border-left: 2px solid var(--border); padding-left: 16px; margin-left: 8px; position: relative; }
+  .timeline-item::before {
+    content: '';
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--teal);
+    position: absolute;
+    left: -6px; top: 14px;
+  }
+  .timeline-time { font-size: 11px; color: var(--muted); min-width: 70px; }
+  .timeline-text { font-size: 13px; color: var(--dark); }
+  .timeline-text strong { color: var(--teal); }
+</style>
+</head>
+<body>
+
+<!-- ─── SIDEBAR ─── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo">Med<span>Care</span></div>
+    <div class="role-badge">Admin Panel</div>
+  </div>
+
+  <div class="nav-section-label">Main</div>
+  <div class="nav-item active" onclick="showPage('dashboard', this)">
+    <span class="nav-icon">📊</span> Dashboard
+  </div>
+  <div class="nav-item" onclick="showPage('appointments', this)">
+    <span class="nav-icon">📅</span> Appointments
+  </div>
+  <div class="nav-item" onclick="showPage('doctors', this)">
+    <span class="nav-icon">👨‍⚕️</span> Doctors
+  </div>
+  <div class="nav-item" onclick="showPage('patients', this)">
+    <span class="nav-icon">🧑‍🤝‍🧑</span> Patients
+  </div>
+
+  <div class="nav-section-label">System</div>
+  <div class="nav-item" onclick="showPage('activity', this)">
+    <span class="nav-icon">🕐</span> Activity Log
+  </div>
+  <div class="nav-item" onclick="showPage('settings', this)">
+    <span class="nav-icon">⚙️</span> Settings
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="admin-profile">
+      <div class="admin-avatar">AD</div>
+      <div class="admin-info">
+        <div class="admin-name">Admin User</div>
+        <div class="admin-role">Super Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ─── MAIN ─── -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="page-title" id="topbar-title">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-btn secondary" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="topbar-btn primary" onclick="openNewApptModal()">+ New Appointment</button>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="page-view active" id="page-dashboard">
+
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card teal">
+          <div class="stat-icon">📅</div>
+          <div class="stat-label">Total Appointments</div>
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-sub">All time</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-icon">✅</div>
+          <div class="stat-label">Confirmed</div>
+          <div class="stat-value" id="stat-confirmed">0</div>
+          <div class="stat-sub">Active bookings</div>
+        </div>
+        <div class="stat-card gold">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-label">Pending</div>
+          <div class="stat-value" id="stat-pending">0</div>
+          <div class="stat-sub">Awaiting confirmation</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-icon">❌</div>
+          <div class="stat-label">Cancelled</div>
+          <div class="stat-value" id="stat-cancelled">0</div>
+          <div class="stat-sub">This month</div>
+        </div>
+      </div>
+
+      <div class="chart-row">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Specialty Breakdown</span>
+          </div>
+          <div class="mini-bar-wrap" id="specialty-bars">
+            <div class="empty-state"><div class="empty-icon">📊</div><p>No appointments yet</p></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Activity</span>
+          </div>
+          <div class="timeline" id="activity-timeline">
+            <div class="empty-state"><div class="empty-icon">🕐</div><p>No activity yet</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Appointments</span>
+          <div class="card-actions">
+            <button class="topbar-btn secondary" onclick="showPage('appointments', document.querySelector('.nav-item:nth-child(4)'))">View All</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Ref #</th>
+              <th>Patient</th>
+              <th>Doctor</th>
+              <th>Specialty</th>
+              <th>Date & Time</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="dashboard-table-body">
+            <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📭</div><p>No appointments booked yet.<br>Book one via the frontend to see it here.</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ APPOINTMENTS ══ -->
+    <div class="page-view" id="page-appointments">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">All Appointments</span>
+          <div class="card-actions">
+            <input class="search-input" id="appt-search" placeholder="🔍  Search patient, doctor…" oninput="renderAppointmentsTable()">
+            <select class="filter-select" id="appt-filter" onchange="renderAppointmentsTable()">
+              <option value="">All Statuses</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Ref #</th>
+              <th>Patient</th>
+              <th>Doctor</th>
+              <th>Specialty</th>
+              <th>Date & Time</th>
+              <th>Visit Type</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="appt-table-body"></tbody>
+        </table>
+        <div class="pagination" id="appt-pagination"></div>
+      </div>
+    </div>
+
+    <!-- ══ DOCTORS ══ -->
+    <div class="page-view" id="page-doctors">
+      <div class="doctors-grid" id="doctors-grid"></div>
+    </div>
+
+    <!-- ══ PATIENTS ══ -->
+    <div class="page-view" id="page-patients">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Patient Records</span>
+          <div class="card-actions">
+            <input class="search-input" id="patient-search" placeholder="🔍  Search patients…" oninput="renderPatientsTable()">
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>DOB</th>
+              <th>Total Visits</th>
+              <th>Last Visit</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="patients-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ ACTIVITY LOG ══ -->
+    <div class="page-view" id="page-activity">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Activity Log</span>
+          <div class="card-actions">
+            <button class="topbar-btn secondary" onclick="clearActivityLog()">Clear Log</button>
+          </div>
+        </div>
+        <div id="full-activity-log" style="padding: 0 24px 24px;"></div>
+      </div>
+    </div>
+
+    <!-- ══ SETTINGS ══ -->
+    <div class="page-view" id="page-settings">
+      <div class="card" style="max-width: 600px;">
+        <div class="card-header"><span class="card-title">System Settings</span></div>
+        <div style="padding: 28px;">
+          <div class="form-group-modal">
+            <label>Hospital Name</label>
+            <input type="text" id="setting-hosp-name" value="MedCare Hospital">
+          </div>
+          <div class="form-group-modal">
+            <label>Admin Email</label>
+            <input type="email" id="setting-email" value="admin@medcare.com">
+          </div>
+          <div class="form-group-modal">
+            <label>Default Appointment Duration (minutes)</label>
+            <select id="setting-duration">
+              <option value="15">15 minutes</option>
+              <option value="30" selected>30 minutes</option>
+              <option value="45">45 minutes</option>
+              <option value="60">60 minutes</option>
+            </select>
+          </div>
+          <div class="form-group-modal">
+            <label>Auto-confirm Bookings</label>
+            <select id="setting-autoconfirm">
+              <option value="yes">Yes – confirm immediately</option>
+              <option value="no">No – mark as pending</option>
+            </select>
+          </div>
+          <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button class="btn-modal primary" onclick="saveSettings()">Save Settings</button>
+            <button class="btn-modal secondary" onclick="clearAllData()">🗑 Clear All Data</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── MODAL: New / Edit Appointment ─── -->
+<div class="modal-overlay" id="appt-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('appt-modal')">✕</button>
+    <div class="modal-title" id="modal-title">New Appointment</div>
+    <div class="modal-sub" id="modal-sub">Fill in the details below to create a booking.</div>
+
+    <div class="modal-row">
+      <div class="form-group-modal">
+        <label>First Name</label>
+        <input type="text" id="m-fname" placeholder="John">
+      </div>
+      <div class="form-group-modal">
+        <label>Last Name</label>
+        <input type="text" id="m-lname" placeholder="Doe">
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="form-group-modal">
+        <label>Email</label>
+        <input type="email" id="m-email" placeholder="john@example.com">
+      </div>
+      <div class="form-group-modal">
+        <label>Phone</label>
+        <input type="tel" id="m-phone" placeholder="+1 555 000 0000">
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="form-group-modal">
+        <label>Specialty</label>
+        <select id="m-specialty">
+          <option>General Medicine</option>
+          <option>Cardiology</option>
+          <option>Neurology</option>
+          <option>Orthopedics</option>
+          <option>Pediatrics</option>
+          <option>Dermatology</option>
+        </select>
+      </div>
+      <div class="form-group-modal">
+        <label>Doctor</label>
+        <select id="m-doctor">
+          <option>Dr. Sarah Chen</option>
+          <option>Dr. James Okonkwo</option>
+          <option>Dr. Priya Sharma</option>
+          <option>Dr. Marc Dupont</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="form-group-modal">
+        <label>Date</label>
+        <input type="date" id="m-date">
+      </div>
+      <div class="form-group-modal">
+        <label>Time</label>
+        <select id="m-time">
+          <option>9:00 AM</option><option>9:30 AM</option><option>10:30 AM</option>
+          <option>11:00 AM</option><option>2:00 PM</option><option>2:30 PM</option>
+          <option>3:00 PM</option><option>4:00 PM</option><option>4:30 PM</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="form-group-modal">
+        <label>Visit Type</label>
+        <select id="m-visit-type">
+          <option>In-Person Visit</option>
+          <option>Video Consultation</option>
+          <option>Phone Consultation</option>
+        </select>
+      </div>
+      <div class="form-group-modal">
+        <label>Status</label>
+        <select id="m-status">
+          <option value="confirmed">Confirmed</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group-modal">
+      <label>Reason for Visit</label>
+      <textarea id="m-reason" rows="2" placeholder="Describe the reason…"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal secondary" onclick="closeModal('appt-modal')">Cancel</button>
+      <button class="btn-modal primary" id="modal-save-btn" onclick="saveAppointment()">Save Appointment</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL: View Appointment Detail ─── -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('detail-modal')">✕</button>
+    <div class="modal-title">Appointment Details</div>
+    <div class="modal-sub" id="detail-ref">Reference —</div>
+    <div class="detail-grid" id="detail-content"></div>
+    <div class="modal-actions">
+      <button class="btn-modal secondary" onclick="closeModal('detail-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ══════════════════════════════════════
+//  DATA LAYER — localStorage backend
+// ══════════════════════════════════════
+
+const DB_KEY   = 'medcare_appointments';
+const LOG_KEY  = 'medcare_activity_log';
+const CONF_KEY = 'medcare_settings';
+
+const DOCTORS = [
+  { name: 'Dr. Sarah Chen',    initials: 'SC', exp: 15, specialty: 'Cardiology' },
+  { name: 'Dr. James Okonkwo', initials: 'JO', exp: 12, specialty: 'Neurology' },
+  { name: 'Dr. Priya Sharma',  initials: 'PS', exp: 9,  specialty: 'Orthopedics' },
+  { name: 'Dr. Marc Dupont',   initials: 'MD', exp: 20, specialty: 'General Medicine' },
+];
+
+function getAppointments() {
+  try { return JSON.parse(localStorage.getItem(DB_KEY)) || []; } catch { return []; }
+}
+
+function saveAppointments(data) {
+  localStorage.setItem(DB_KEY, JSON.stringify(data));
+}
+
+function getSettings() {
+  const defaults = { hospName: 'MedCare Hospital', email: 'admin@medcare.com', duration: '30', autoConfirm: 'yes' };
+  try { return Object.assign({}, defaults, JSON.parse(localStorage.getItem(CONF_KEY))); } catch { return defaults; }
+}
+
+function persistSettings(s) { localStorage.setItem(CONF_KEY, JSON.stringify(s)); }
+
+function getLog() {
+  try { return JSON.parse(localStorage.getItem(LOG_KEY)) || []; } catch { return []; }
+}
+
+function addLog(msg) {
+  const log = getLog();
+  log.unshift({ msg, time: new Date().toISOString() });
+  if (log.length > 100) log.pop();
+  localStorage.setItem(LOG_KEY, JSON.stringify(log));
+}
+
+// ══════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════
+
+const PAGE_TITLES = {
+  dashboard: 'Dashboard', appointments: 'Appointments',
+  doctors: 'Doctors', patients: 'Patients',
+  activity: 'Activity Log', settings: 'Settings'
+};
+
+function showPage(name, navEl) {
+  document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('topbar-title').textContent = PAGE_TITLES[name] || name;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (navEl) navEl.classList.add('active');
+
+  if (name === 'dashboard')     refreshDashboard();
+  if (name === 'appointments')  renderAppointmentsTable();
+  if (name === 'doctors')       renderDoctors();
+  if (name === 'patients')      renderPatientsTable();
+  if (name === 'activity')      renderActivityLog();
+  if (name === 'settings')      loadSettings();
+}
+
+// ══════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════
+
+function refreshDashboard() {
+  const appts = getAppointments();
+
+  const counts = { confirmed: 0, pending: 0, cancelled: 0, completed: 0 };
+  appts.forEach(a => { if (counts[a.status] !== undefined) counts[a.status]++; });
+
+  document.getElementById('stat-total').textContent     = appts.length;
+  document.getElementById('stat-confirmed').textContent = counts.confirmed;
+  document.getElementById('stat-pending').textContent   = counts.pending;
+  document.getElementById('stat-cancelled').textContent = counts.cancelled;
+
+  // Specialty bars
+  const specCount = {};
+  appts.forEach(a => { specCount[a.specialty] = (specCount[a.specialty] || 0) + 1; });
+  const max = Math.max(...Object.values(specCount), 1);
+  const barsEl = document.getElementById('specialty-bars');
+  if (Object.keys(specCount).length === 0) {
+    barsEl.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>No appointments yet</p></div>';
+  } else {
+    barsEl.innerHTML = Object.entries(specCount)
+      .sort((a, b) => b[1] - a[1])
+      .map(([spec, n]) => `
+        <div class="mini-bar-label"><span>${spec}</span><span><b>${n}</b></span></div>
+        <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${(n/max)*100}%"></div></div>
+      `).join('');
+  }
+
+  // Activity
+  const log = getLog().slice(0, 5);
+  const tlEl = document.getElementById('activity-timeline');
+  if (!log.length) {
+    tlEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🕐</div><p>No activity yet</p></div>';
+  } else {
+    tlEl.innerHTML = log.map(l => `
+      <div class="timeline-item">
+        <div class="timeline-time">${formatTime(l.time)}</div>
+        <div class="timeline-text">${l.msg}</div>
+      </div>
+    `).join('');
+  }
+
+  // Recent table (last 5)
+  const recent = [...appts].reverse().slice(0, 5);
+  const tbody = document.getElementById('dashboard-table-body');
+  if (!recent.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📭</div><p>No appointments booked yet.<br>Book one via the frontend to see it here.</p></div></td></tr>';
+  } else {
+    tbody.innerHTML = recent.map(a => rowHTML(a)).join('');
+  }
+}
+
+// ══════════════════════════════════════
+//  APPOINTMENTS TABLE
+// ══════════════════════════════════════
+
+let currentPage = 1;
+const PAGE_SIZE  = 8;
+
+function renderAppointmentsTable() {
+  let appts = getAppointments();
+  const q  = (document.getElementById('appt-search')?.value || '').toLowerCase();
+  const st = document.getElementById('appt-filter')?.value || '';
+
+  if (q)  appts = appts.filter(a => (a.patient + a.doctor + a.ref).toLowerCase().includes(q));
+  if (st) appts = appts.filter(a => a.status === st);
+
+  appts = [...appts].reverse();
+  const total = appts.length;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (currentPage > pages) currentPage = pages;
+
+  const slice = appts.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const tbody = document.getElementById('appt-table-body');
+
+  if (!slice.length) {
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📭</div><p>No appointments found.</p></div></td></tr>';
+  } else {
+    tbody.innerHTML = slice.map(a => rowHTMLFull(a)).join('');
+  }
+
+  const pag = document.getElementById('appt-pagination');
+  pag.innerHTML = `
+    <div class="page-info">Showing ${slice.length} of ${total} appointments</div>
+    <div class="page-btns">
+      <button class="page-btn" onclick="changePage(-1)" ${currentPage===1?'disabled':''}>← Prev</button>
+      <button class="page-btn active">${currentPage} / ${pages}</button>
+      <button class="page-btn" onclick="changePage(1)" ${currentPage===pages?'disabled':''}>Next →</button>
+    </div>
+  `;
+}
+
+function changePage(d) { currentPage += d; renderAppointmentsTable(); }
+
+function rowHTML(a) {
+  const initials = doctorInitials(a.doctor);
+  return `<tr>
+    <td><code style="font-size:11px;color:var(--teal)">${a.ref}</code></td>
+    <td>${a.patient}</td>
+    <td><div class="cell-with-avatar"><div class="mini-avatar">${initials}</div>${a.doctor}</div></td>
+    <td>${a.specialty}</td>
+    <td>${formatDate(a.date)} · ${a.time}</td>
+    <td>${statusBadge(a.status)}</td>
+    <td>
+      <button class="action-btn" onclick="viewDetail('${a.ref}')">View</button>
+      <button class="action-btn danger" onclick="deleteAppt('${a.ref}')">Delete</button>
+    </td>
+  </tr>`;
+}
+
+function rowHTMLFull(a) {
+  const initials = doctorInitials(a.doctor);
+  return `<tr>
+    <td><code style="font-size:11px;color:var(--teal)">${a.ref}</code></td>
+    <td>${a.patient}</td>
+    <td><div class="cell-with-avatar"><div class="mini-avatar">${initials}</div>${a.doctor}</div></td>
+    <td>${a.specialty}</td>
+    <td>${formatDate(a.date)} · ${a.time}</td>
+    <td>${a.visitType || 'In-Person'}</td>
+    <td>${statusBadge(a.status)}</td>
+    <td>
+      <button class="action-btn" onclick="viewDetail('${a.ref}')">View</button>
+      <button class="action-btn success" onclick="editAppt('${a.ref}')">Edit</button>
+      <button class="action-btn danger"  onclick="deleteAppt('${a.ref}')">Delete</button>
+    </td>
+  </tr>`;
+}
+
+function statusBadge(s) {
+  return `<span class="badge-status ${s}"><span class="dot"></span>${capitalize(s)}</span>`;
+}
+
+function doctorInitials(name) {
+  return name.split(' ').filter(w => w[0] === w[0].toUpperCase()).map(w => w[0]).join('').slice(0, 2);
+}
+
+// ══════════════════════════════════════
+//  DOCTORS VIEW
+// ══════════════════════════════════════
+
+function renderDoctors() {
+  const appts = getAppointments();
+  const grid  = document.getElementById('doctors-grid');
+  grid.innerHTML = DOCTORS.map(doc => {
+    const total     = appts.filter(a => a.doctor === doc.name).length;
+    const confirmed = appts.filter(a => a.doctor === doc.name && a.status === 'confirmed').length;
+    return `
+      <div class="doctor-card-admin">
+        <div class="doc-avatar-lg">${doc.initials}</div>
+        <div class="doc-name">${doc.name}</div>
+        <div class="doc-spec">${doc.specialty} · ${doc.exp} yrs exp.</div>
+        <div class="doc-stats">
+          <div class="doc-stat-item">
+            <div class="doc-stat-val">${total}</div>
+            <div class="doc-stat-lbl">Total</div>
+          </div>
+          <div class="doc-stat-item">
+            <div class="doc-stat-val">${confirmed}</div>
+            <div class="doc-stat-lbl">Confirmed</div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+//  PATIENTS VIEW
+// ══════════════════════════════════════
+
+function renderPatientsTable() {
+  const appts = getAppointments();
+  const q = (document.getElementById('patient-search')?.value || '').toLowerCase();
+
+  // Group by email
+  const map = {};
+  appts.forEach(a => {
+    const key = (a.email || a.patient).toLowerCase();
+    if (!map[key]) map[key] = { name: a.patient, email: a.email || '—', phone: a.phone || '—', dob: a.dob || '—', visits: [], lastVisit: '' };
+    map[key].visits.push(a);
+    if (!map[key].lastVisit || a.date > map[key].lastVisit) map[key].lastVisit = a.date;
+  });
+
+  let patients = Object.values(map).filter(p =>
+    !q || p.name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q)
+  );
+
+  const tbody = document.getElementById('patients-table-body');
+  if (!patients.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🧑‍🤝‍🧑</div><p>No patients found.</p></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = patients.map(p => `
+    <tr>
+      <td><b>${p.name}</b></td>
+      <td>${p.email}</td>
+      <td>${p.phone}</td>
+      <td>${p.dob !== '—' ? formatDate(p.dob) : '—'}</td>
+      <td>${p.visits.length}</td>
+      <td>${p.lastVisit ? formatDate(p.lastVisit) : '—'}</td>
+      <td><button class="action-btn" onclick="alert('Patient records coming soon!')">Records</button></td>
+    </tr>
+  `).join('');
+}
+
+// ══════════════════════════════════════
+//  ACTIVITY LOG
+// ══════════════════════════════════════
+
+function renderActivityLog() {
+  const log = getLog();
+  const el  = document.getElementById('full-activity-log');
+  if (!log.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🕐</div><p>No activity recorded yet.</p></div>';
+    return;
+  }
+  el.innerHTML = `<div class="timeline" style="padding: 20px 0;">${log.map(l => `
+    <div class="timeline-item">
+      <div class="timeline-time">${new Date(l.time).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}</div>
+      <div class="timeline-text">${l.msg}</div>
+    </div>
+  `).join('')}</div>`;
+}
+
+function clearActivityLog() {
+  if (confirm('Clear the activity log?')) {
+    localStorage.removeItem(LOG_KEY);
+    renderActivityLog();
+    toast('Activity log cleared.', 'warning');
+  }
+}
+
+// ══════════════════════════════════════
+//  SETTINGS
+// ══════════════════════════════════════
+
+function loadSettings() {
+  const s = getSettings();
+  document.getElementById('setting-hosp-name').value   = s.hospName;
+  document.getElementById('setting-email').value       = s.email;
+  document.getElementById('setting-duration').value    = s.duration;
+  document.getElementById('setting-autoconfirm').value = s.autoConfirm;
+}
+
+function saveSettings() {
+  persistSettings({
+    hospName:    document.getElementById('setting-hosp-name').value,
+    email:       document.getElementById('setting-email').value,
+    duration:    document.getElementById('setting-duration').value,
+    autoConfirm: document.getElementById('setting-autoconfirm').value,
+  });
+  addLog('Settings updated by admin.');
+  toast('Settings saved!', 'success');
+}
+
+function clearAllData() {
+  if (confirm('⚠️ This will permanently delete ALL appointments and logs. Are you sure?')) {
+    localStorage.removeItem(DB_KEY);
+    localStorage.removeItem(LOG_KEY);
+    addLog('All appointment data cleared by admin.');
+    toast('All data cleared.', 'danger');
+    refreshDashboard();
+  }
+}
+
+// ══════════════════════════════════════
+//  MODAL: New / Edit
+// ══════════════════════════════════════
+
+let editingRef = null;
+
+function openNewApptModal() {
+  editingRef = null;
+  document.getElementById('modal-title').textContent   = 'New Appointment';
+  document.getElementById('modal-sub').textContent     = 'Fill in the details below to create a booking.';
+  document.getElementById('modal-save-btn').textContent = 'Save Appointment';
+  ['m-fname','m-lname','m-email','m-phone','m-reason'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('m-date').value   = new Date().toISOString().split('T')[0];
+  document.getElementById('m-status').value = 'confirmed';
+  openModal('appt-modal');
+}
+
+function editAppt(ref) {
+  const appts = getAppointments();
+  const a = appts.find(x => x.ref === ref);
+  if (!a) return;
+  editingRef = ref;
+
+  document.getElementById('modal-title').textContent    = 'Edit Appointment';
+  document.getElementById('modal-sub').textContent      = `Editing: ${ref}`;
+  document.getElementById('modal-save-btn').textContent = 'Update Appointment';
+
+  document.getElementById('m-fname').value       = (a.patient || '').split(' ')[0] || '';
+  document.getElementById('m-lname').value       = (a.patient || '').split(' ').slice(1).join(' ') || '';
+  document.getElementById('m-email').value       = a.email || '';
+  document.getElementById('m-phone').value       = a.phone || '';
+  document.getElementById('m-specialty').value   = a.specialty || 'General Medicine';
+  document.getElementById('m-doctor').value      = a.doctor || 'Dr. Sarah Chen';
+  document.getElementById('m-date').value        = a.date || '';
+  document.getElementById('m-time').value        = a.time || '9:00 AM';
+  document.getElementById('m-visit-type').value  = a.visitType || 'In-Person Visit';
+  document.getElementById('m-status').value      = a.status || 'confirmed';
+  document.getElementById('m-reason').value      = a.reason || '';
+
+  openModal('appt-modal');
+}
+
+function saveAppointment() {
+  const fname = document.getElementById('m-fname').value.trim();
+  const lname = document.getElementById('m-lname').value.trim();
+  if (!fname) { toast('Please enter a first name.', 'warning'); return; }
+
+  const settings = getSettings();
+  const appts = getAppointments();
+
+  const appt = {
+    ref:       editingRef || ('MC-' + Math.floor(100000 + Math.random() * 900000)),
+    patient:   (fname + ' ' + lname).trim(),
+    email:     document.getElementById('m-email').value.trim(),
+    phone:     document.getElementById('m-phone').value.trim(),
+    specialty: document.getElementById('m-specialty').value,
+    doctor:    document.getElementById('m-doctor').value,
+    date:      document.getElementById('m-date').value,
+    time:      document.getElementById('m-time').value,
+    visitType: document.getElementById('m-visit-type').value,
+    status:    settings.autoConfirm === 'yes' ? document.getElementById('m-status').value : 'pending',
+    reason:    document.getElementById('m-reason').value.trim(),
+    createdAt: editingRef ? appts.find(x=>x.ref===editingRef)?.createdAt : new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (editingRef) {
+    const idx = appts.findIndex(x => x.ref === editingRef);
+    if (idx !== -1) appts[idx] = appt;
+    addLog(`Appointment <strong>${appt.ref}</strong> updated for ${appt.patient}.`);
+    toast('Appointment updated!', 'success');
+  } else {
+    appts.push(appt);
+    addLog(`New appointment <strong>${appt.ref}</strong> created for ${appt.patient}.`);
+    toast('Appointment created!', 'success');
+  }
+
+  saveAppointments(appts);
+  closeModal('appt-modal');
+  renderAppointmentsTable();
+  refreshDashboard();
+}
+
+// ══════════════════════════════════════
+//  MODAL: Detail View
+// ══════════════════════════════════════
+
+function viewDetail(ref) {
+  const appts = getAppointments();
+  const a = appts.find(x => x.ref === ref);
+  if (!a) return;
+
+  document.getElementById('detail-ref').textContent = 'Reference: ' + ref;
+  document.getElementById('detail-content').innerHTML = [
+    ['Patient',    a.patient],
+    ['Email',      a.email || '—'],
+    ['Phone',      a.phone || '—'],
+    ['Specialty',  a.specialty],
+    ['Doctor',     a.doctor],
+    ['Date',       formatDate(a.date)],
+    ['Time',       a.time],
+    ['Visit Type', a.visitType || 'In-Person'],
+    ['Status',     statusBadge(a.status)],
+    ['Reason',     a.reason || '—'],
+    ['Created',    a.createdAt ? new Date(a.createdAt).toLocaleString() : '—'],
+    ['Updated',    a.updatedAt ? new Date(a.updatedAt).toLocaleString() : '—'],
+  ].map(([l, v]) => `
+    <div class="detail-row">
+      <span class="dl">${l}</span>
+      <span class="dv">${v}</span>
+    </div>
+  `).join('');
+
+  openModal('detail-modal');
+}
+
+// ══════════════════════════════════════
+//  DELETE
+// ══════════════════════════════════════
+
+function deleteAppt(ref) {
+  if (!confirm(`Delete appointment ${ref}?`)) return;
+  let appts = getAppointments();
+  const a = appts.find(x => x.ref === ref);
+  appts = appts.filter(x => x.ref !== ref);
+  saveAppointments(appts);
+  if (a) addLog(`Appointment <strong>${ref}</strong> deleted (${a.patient}).`);
+  toast('Appointment deleted.', 'danger');
+  renderAppointmentsTable();
+  refreshDashboard();
+}
+
+// ══════════════════════════════════════
+//  EXPORT CSV
+// ══════════════════════════════════════
+
+function exportCSV() {
+  const appts = getAppointments();
+  if (!appts.length) { toast('No appointments to export.', 'warning'); return; }
+  const headers = ['Ref','Patient','Email','Phone','Specialty','Doctor','Date','Time','Visit Type','Status','Reason'];
+  const rows = appts.map(a => [
+    a.ref, a.patient, a.email, a.phone, a.specialty, a.doctor, a.date, a.time, a.visitType, a.status, a.reason
+  ].map(v => `"${(v||'').replace(/"/g,'""')}"`).join(','));
+  const csv  = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'medcare-appointments.csv'; a.click();
+  URL.revokeObjectURL(url);
+  addLog('Appointments exported to CSV.');
+  toast('CSV exported!', 'success');
+}
+
+// ══════════════════════════════════════
+//  UTILITIES
+// ══════════════════════════════════════
+
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function toast(msg, type = 'success') {
+  const tc = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${type === 'success' ? '✅' : type === 'danger' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span> ${msg}`;
+  tc.appendChild(el);
+  setTimeout(() => {
+    el.style.animation = 'toastOut 0.3s ease forwards';
+    setTimeout(() => el.remove(), 300);
+  }, 3000);
+}
+
+function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+
+function formatDate(d) {
+  if (!d) return '—';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+}
+
+function formatTime(iso) {
+  return new Date(iso).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+}
+
+// ══════════════════════════════════════
+//  LISTEN FOR FRONTEND BOOKINGS
+//  (storage event fires when hospital-booking.html writes to localStorage)
+// ══════════════════════════════════════
+
+window.addEventListener('storage', (e) => {
+  if (e.key === DB_KEY) {
+    refreshDashboard();
+    toast('New appointment received from frontend!', 'success');
+  }
+});
+
+// ══════════════════════════════════════
+//  SEED DEMO DATA (if empty)
+// ══════════════════════════════════════
+
+function seedDemo() {
+  const appts = getAppointments();
+  if (appts.length > 0) return;
+
+  const demo = [
+    { ref: 'MC-482910', patient: 'Alice Johnson', email: 'alice@example.com', phone: '+1 555 123 4567', specialty: 'Cardiology', doctor: 'Dr. Sarah Chen', date: '2026-04-10', time: '9:30 AM', visitType: 'In-Person Visit', status: 'confirmed', reason: 'Annual heart check-up', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { ref: 'MC-391827', patient: 'Bob Martinez',  email: 'bob@example.com',   phone: '+1 555 987 6543', specialty: 'Neurology',  doctor: 'Dr. James Okonkwo', date: '2026-04-11', time: '11:00 AM', visitType: 'Video Consultation', status: 'pending', reason: 'Recurring headaches', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { ref: 'MC-274618', patient: 'Clara Nguyen',  email: 'clara@example.com', phone: '+1 555 246 8013', specialty: 'Dermatology', doctor: 'Dr. Priya Sharma', date: '2026-04-08', time: '2:00 PM', visitType: 'In-Person Visit', status: 'completed', reason: 'Skin rash evaluation', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { ref: 'MC-163945', patient: 'David Lee',     email: 'david@example.com', phone: '+1 555 135 7924', specialty: 'Orthopedics', doctor: 'Dr. Marc Dupont', date: '2026-04-09', time: '4:00 PM', visitType: 'In-Person Visit', status: 'cancelled', reason: 'Knee pain follow-up', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  ];
+  saveAppointments(demo);
+  demo.forEach(a => addLog(`Demo booking <strong>${a.ref}</strong> created for ${a.patient}.`));
+}
+
+// ══════════════════════════════════════
+//  HOOK: intercept frontend bookings
+//  The booking frontend calls confirmBooking() and writes to localStorage.
+//  We wrap it so the admin dashboard can also receive the data.
+// ══════════════════════════════════════
+
+function ingestFrontendBooking(data) {
+  // Called programmatically if both pages share the same origin & tab
+  const appts = getAppointments();
+  appts.push(data);
+  saveAppointments(appts);
+  addLog(`Frontend booking <strong>${data.ref}</strong> received for ${data.patient}.`);
+  refreshDashboard();
+}
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+
+seedDemo();
+refreshDashboard();
+</script>
+</body>
+</html>
